@@ -44,7 +44,7 @@
                             
                             @if(!empty($sessao['descricao']))
                                 <div class="mb-6 border-l-4 border-primary-500 pl-4">
-                                    <p class="text-sm text-gray-600 dark:text-gray-400">
+                                    <p class="text-base text-gray-600 dark:text-gray-400">
                                         {{ $sessao['descricao'] }}
                                     </p>
                                 </div>
@@ -66,14 +66,14 @@
                                         
                                         {{-- Título e Descrição --}}
                                         <div class="flex flex-col gap-y-1">
-                                            <span class="text-sm font-bold text-gray-900 dark:text-white">
+                                            <span class="text-lg font-bold text-gray-900 dark:text-white">
                                                 {{ $nome_exibicao }}
                                                 @if($is_required) <span class="text-danger-600">*</span> @endif
                                             </span>
                                             
 
                                             @if(!empty($descricao))
-                                                <p class="text-xs text-gray-500 dark:text-gray-400">
+                                                <p class="text-sm text-gray-500 dark:text-gray-400">
                                                     {{ $descricao }}
                                                 </p>
                                             @endif

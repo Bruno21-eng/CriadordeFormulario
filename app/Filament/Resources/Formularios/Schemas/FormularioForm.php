@@ -15,6 +15,8 @@ use Filament\Forms\Components\Toggle;
 use Filament\Forms\Components\RichEditor;
 use Filament\Schemas\Components\Grid;
 use Filament\Support\Enums\Width;
+
+
 class FormularioForm
 {
     public static function configure(Schema $schema): Schema
@@ -29,11 +31,11 @@ class FormularioForm
                         ->modalHeading('Visualização do Formulário')
                         ->modalSubmitAction(false)
                         ->modalWidth('7xl')
-                        ->slideOver()
-                            ->modalContent(fn ($get) => view('filament.forms.preview-container', [
-                                'paginas' => $get('paginas'),
-                                'titulo' => $get('titulo'),
-                            ])),
+                        
+                        ->modalContent(fn ($get) => view('filament.forms.preview-container', [
+                            'paginas' => $get('paginas'),
+                            'titulo' => $get('titulo'),
+                        ])),
                 ]),
                 TextInput::make('titulo')
                     ->required()
@@ -104,7 +106,7 @@ class FormularioForm
                                     Repeater::make('opcoes_calendario')
                                         ->label('Opções do Calendário')
                                         ->schema([
-                                            TextInput::make('opcao_texto')->label('Título do Calendário')->required(),
+                                            TextInput::make('opcao_texto')->label('Título do Calendário')->required()->placeholder('Ex: Data de nascimento'),
                                             TextInput::make('id_elemento')->label('ID do Elemento')->required()->placeholder('Ex: data_nascimento'),
                                         ])
                                         ->visible(fn ($get) => $get('tipo_do_elemento') === 'Calendário')
@@ -130,4 +132,5 @@ class FormularioForm
                 ->columnSpanFull()
             ]);                             
         }
+
 }
