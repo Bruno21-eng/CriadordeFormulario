@@ -1,0 +1,13 @@
+/** @type {import('tailwindcss').Config} */
+export default {
+  content: [
+    './resources/**/*.blade.php',
+    './app/Filament/**/*.php',
+    './vendor/filament/**/*.blade.php',
+  ],
+  theme: {
+    extend: {},
+  },
+  plugins: [],
+}
+
