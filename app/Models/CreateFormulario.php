@@ -2,27 +2,28 @@
 
 namespace App\Models;
 
+use App\Models\Formulario;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class CreateFormulario extends Model
 {
-    use HasFactory;
-
-    // Permite que o Laravel salve esses campos em massa
+    protected $table = 'Createformularios';
+    
+    protected $casts =[
+        'paginas' => 'array',
+    ];
     protected $fillable = [
+        'user_id',
+        'criador_nome',
         'titulo',
-        'respostas',
+        'senha',
+        'paginas',
     ];
-
-    // Transforma o JSON do banco de dados em Array do PHP automaticamente
-    protected $casts = [
-        'respostas' => 'array',
-    ];
-
-    public function formulario(): BelongsTo
-    {
-        return $this->belongsTo(Formulario::class, 'formulario_id');
-    }
+    public function respostas(): HasMany
+{
+    // Relaciona com o model que guarda os preenchimentos (Formulario)
+    // usando a chave estrangeira que você definiu na migration
+    return $this->hasMany(Formulario::class, 'Createformulario_id');
+}
 }

@@ -9,10 +9,12 @@ class CreateFormulario extends CreateRecord
 {
     protected static string $resource = FormularioResource::class;
 
-    protected function mutateFormDataBeforeCreate(array $data): array
+    public function getTitle(): string
     {
-        $data['user_id'] = auth()->id();
-        $data['criador_nome'] = auth()->user()->name;
-        return $data;
+        return "Visualizar Fórmularios";
+    }
+    public function getBreadcrumb(): string
+    {
+        return 'Visualização'; // Ou "Adicionar", "Gerar", etc.
     }
 }

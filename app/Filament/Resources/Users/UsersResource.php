@@ -2,29 +2,29 @@
 
 namespace App\Filament\Resources\Users;
 
-use App\Filament\Resources\Users\Pages\CreateUser;
-use App\Filament\Resources\Users\Pages\EditUser;
+use App\Filament\Resources\Users\Pages\CreateUsers;
+use App\Filament\Resources\Users\Pages\EditUsers;
 use App\Filament\Resources\Users\Pages\ListUsers;
-use App\Filament\Resources\Users\Schemas\UserForm;
+use App\Filament\Resources\Users\Schemas\UsersForm;
 use App\Filament\Resources\Users\Tables\UsersTable;
-use App\Models\User;
+use App\Models\Users;
 use BackedEnum;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
 
-class UserResource extends Resource
+class UsersResource extends Resource
 {
-    protected static ?string $model = User::class;
+    protected static ?string $model = Users::class;
 
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedUser;
 
-    protected static ?string $recordTitleAttribute = 'geral';
+    protected static ?string $recordTitleAttribute = 'Users';
 
     public static function form(Schema $schema): Schema
     {
-        return UserForm::configure($schema);
+        return UsersForm::configure($schema);
     }
 
     public static function table(Table $table): Table
@@ -43,8 +43,8 @@ class UserResource extends Resource
     {
         return [
             'index' => ListUsers::route('/'),
-            'create' => CreateUser::route('/create'),
-            'edit' => EditUser::route('/{record}/edit'),
+            'create' => CreateUsers::route('/create'),
+            'edit' => EditUsers::route('/{record}/edit'),
         ];
     }
 }

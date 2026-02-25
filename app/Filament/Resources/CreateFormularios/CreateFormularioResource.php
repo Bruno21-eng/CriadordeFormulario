@@ -18,9 +18,11 @@ class CreateFormularioResource extends Resource
 {
     protected static ?string $model = CreateFormulario::class;
 
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+    protected static ?string $modelLabel = 'Criação de Formulários';
 
-    protected static ?string $recordTitleAttribute = 'CreateFormulario';
+    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedClipboardDocument;
+
+    protected static ?string $recordTitleAttribute = 'CreateFormularioResource';
 
     public static function form(Schema $schema): Schema
     {

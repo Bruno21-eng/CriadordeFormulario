@@ -1,13 +1,13 @@
 <?php
 
-namespace App\Filament\Resources\Users\Tables;
+namespace App\Filament\Resources\Respostas\Tables;
 
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Tables\Table;
 
-class UsersTable
+class RespostasTable
 {
     public static function configure(Table $table): Table
     {

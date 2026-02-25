@@ -11,10 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('create_formularios', function (Blueprint $table) {
+        Schema::create('formularios', function (Blueprint $table) {
             $table->id();
             // FK para saber de qual formulário essa resposta pertence
-            $table->foreignId('formulario_id')->constrained('formularios')->onDelete('cascade');
+            $table->foreignId('Createformulario_id')->constrained('Createformularios')->onDelete('cascade');
             // Onde vamos salvar as respostas (ex: {"nome": "João", "idade": 25})
             $table->json('respostas')->nullable(); 
             $table->timestamps();
@@ -26,6 +26,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('create_formularios');
+        Schema::dropIfExists('formularios');
     }
 };
