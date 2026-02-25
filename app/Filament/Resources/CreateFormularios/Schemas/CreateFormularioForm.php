@@ -53,7 +53,7 @@ class CreateFormularioForm
                     Repeater::make('Sessões')
                         ->inset()
                         ->schema([
-                            TextInput::make('titulo_sessão')
+                            TextInput::make('titulo-sessão')
                                 ->required()
                                 ->label('Título da Sessão')
                                 ->live()
@@ -64,9 +64,9 @@ class CreateFormularioForm
                             Repeater::make('Elementos')
                                 ->reorderableWithButtons()
                                 ->collapsible()
-                                ->itemLabel(fn (array $state): ?string => $state['tipo_do_elemento'] ?? 'Novo Elemento')
+                                ->itemLabel(fn (array $state): ?string => $state['tipo-do-elemento'] ?? 'Novo Elemento')
                                 ->schema([
-                                    Select::make('tipo_do_elemento')
+                                    Select::make('tipo-do-elemento')
                                         ->options([
                                             'Texto' => 'Campo de texto',
                                             'Radio' => 'Botão de opção',
@@ -86,43 +86,40 @@ class CreateFormularioForm
                                         ->label('Configurações Básicas')
                                         ->description('Preencha os detalhes do campo selecionado')
                                         ->compact()
-                                        ->visible(fn ($get) => in_array($get('tipo_do_elemento'), ['Texto','Radio','RichEditor','Imagem','Seleção']))
-                                        ->columnSpan(fn($get) => in_array($get('tipo_do_elemento'), ['Texto', 'Imagem', 'RichEditor']) ? 'full' : 1)
+                                        ->visible(fn ($get) => in_array($get('tipo-do-elemento'), ['Texto','Radio','RichEditor','Imagem','Seleção', 'Calendário']))
+                                        ->columnSpan(fn($get) => in_array($get('tipo-do-elemento'), ['Texto', 'Imagem', 'RichEditor', 'Calendário']) ? 'full' : 1)
                                         ->schema([
-                                            TextInput::make('nome_elemento')
+                                            TextInput::make('nome-elemento')
                                                 ->label('Nome do Elemento')
                                                 ->required()
-                                                ->placeholder('Ex: Nome Completo'),
-                                            TextInput::make('id_elemento')
+                                                ->placeholder('Ex: Nome Completo')
+                                                ->live()
+                                                ->afterStateUpdated(fn (string $operation, $state, Set $set) => $operation === 'create'
+                                                ? $set('id-elemento', Str::slug($state)) : null),
+                                            TextInput::make('id-elemento')
                                                 ->label('ID do Elemento')
                                                 ->required()
-                                                ->placeholder('Ex: nome_usuario'),
-                                            TextInput::make('descricao_elemento')
+                                                ->disabled()
+                                                ->dehydrated()
+                                                ->placeholder('Ex: nome-usuario'),
+                                            TextInput::make('descricao-elemento')
                                                 ->label('Descrição do Elemento')
                                                 ->live()
                                                 ->placeholder('Digite uma descrição ou instrução para o usuário (ñ obrigatório)'),
                                             TextInput::make('placeholder')
                                                 ->label('Placeholder (Dica)')
                                                 ->placeholder('Digite aqui...')
-                                                ->hidden(fn ($get) => in_array($get('tipo_do_elemento'), ['Imagem', 'Seleção', 'Radio'])),
+                                                ->hidden(fn ($get) => in_array($get('tipo-do-elemento'), ['Imagem', 'Seleção', 'Radio', 'Calendário'])),
                                         ]),
-                                    Repeater::make('opcoes_selecao')
+                                    Repeater::make('opcoes-selecao')
                                         ->label('Opções da Lista')
                                         ->schema([
-                                            TextInput::make('opcao_texto')->label('Texto da Opção')->required(),
-                                            TextInput::make('descrição')->label('Descrição da Opção')->hidden(fn ($get) => $get('../../tipo_do_elemento') === 'Seleção'),
+                                            TextInput::make('opcao-texto')->label('Texto da Opção')->required(),
+                                            TextInput::make('descrição')->label('Descrição da Opção')->hidden(fn ($get) => $get('../../tipo-do-elemento') === 'Seleção'),
                                         ])
-                                        ->visible(fn ($get) => in_array($get('tipo_do_elemento'), ['Seleção', 'Radio']))
+                                        ->visible(fn ($get) => in_array($get('tipo-do-elemento'), ['Seleção', 'Radio']))
                                         ->addActionLabel('Adicionar Opção'),
-                                    Repeater::make('opcoes_calendario')
-                                        ->label('Opções do Calendário')
-                                        ->schema([
-                                            TextInput::make('opcao_texto')->label('Título do Calendário')->required()->placeholder('Ex: Data de nascimento'),
-                                            TextInput::make('id_elemento')->label('ID do Elemento')->required()->placeholder('Ex: data_nascimento'),
-                                        ])
-                                        ->visible(fn ($get) => $get('tipo_do_elemento') === 'Calendário')
-                                        ->columnSpan('full')
-                                        ->addActionLabel('Adicionar Calendário'),
+                                    
                                 ])
                                 ->addActionLabel('Adicionar Elemento')
                                 ->addAction(

@@ -36,7 +36,7 @@
                 @foreach($pagina['Sessões'] ?? [] as $sessao)
                     <x-filament::section>
                         <x-slot name="heading">
-                            <span class="text-lg font-semibold">{{ $sessao['titulo_sessão'] ?? 'Sessão sem título' }}</span>
+                            <span class="text-lg font-semibold">{{ $sessao['titulo-sessão'] ?? 'Sessão sem título' }}</span>
                         </x-slot>
 
                         {{-- Container da sessão --}}
@@ -54,9 +54,9 @@
                             <div class="grid grid-cols-1 gap-6">
                                 @foreach($sessao['Elementos'] ?? [] as $elemento)
                                     @php
-                                        $tipo = $elemento['tipo_do_elemento'] ?? '';
-                                        $nome_exibicao = $elemento['nome_elemento'] ?? 'Campo sem nome';
-                                        $descricao = $elemento['descricao_elemento'] ?? ''; 
+                                        $tipo = $elemento['tipo-do-elemento'] ?? '';
+                                        $nome_exibicao = $elemento['nome-elemento'] ?? 'Campo sem nome';
+                                        $descricao = $elemento['descricao-elemento'] ?? ''; 
                                         $is_required = !empty($elemento['Obrigatorio']);
                                         $placeholder = $elemento['placeholder'] ?? '';
                                     @endphp
@@ -98,17 +98,17 @@
                                                 <x-filament::input.wrapper>
                                                     <x-filament::input.select>
                                                         <option>{{ $placeholder ?: 'Selecione uma opção...' }}</option>
-                                                        @foreach($elemento['opcoes_selecao'] ?? [] as $opcao)
-                                                            <option>{{ $opcao['opcao_texto'] }}</option>
+                                                        @foreach($elemento['opcoes-selecao'] ?? [] as $opcao)
+                                                            <option>{{ $opcao['opcao-texto'] }}</option>
                                                         @endforeach
                                                     </x-filament::input.select>
                                                 </x-filament::input.wrapper>
                                             @elseif($tipo === 'Radio')
                                                 <div class="flex flex-col gap-y-2">
-                                                    @foreach($elemento['opcoes_selecao'] ?? [] as $opcao)
+                                                    @foreach($elemento['opcoes-selecao'] ?? [] as $opcao)
                                                         <label class="inline-flex items-center gap-x-2">
                                                             <input type="radio"  class="form-radio text-primary-600" name="{{ $nome_exibicao }}">
-                                                            <span class="text-sm text-gray-700 dark:text-gray-300">{{ $opcao['opcao_texto'] }}</span>
+                                                            <span class="text-sm text-gray-700 dark:text-gray-300">{{ $opcao['opcao-texto'] }}</span>
                                                         </label>
                                                         <p class="text-xs text-gray-500 dark:text-gray-400">{{$opcao['descrição']}}</p>
                                                     @endforeach
@@ -119,6 +119,13 @@
                                                     <div class="flex items-center p-2 text-gray-400">
                                                         <x-filament::icon icon="heroicon-m-calendar" class="w-5 h-5 mr-2" />
                                                         <span class="text-sm">Selecionar data...</span>
+                                                    </div>
+                                                </x-filament::input.wrapper>
+                                            @elseif($tipo === 'Imagem')
+                                                <x-filament::input.wrapper>
+                                                    <div class="flex items-center p-2 text-gray-400">
+                                                        <x-filament::icon icon="heroicon-m-photo" class="w-5 h-5 mr-2" />
+                                                        <span class="text-sm">Upload de imagem...</span>
                                                     </div>
                                                 </x-filament::input.wrapper>
                                             @endif
