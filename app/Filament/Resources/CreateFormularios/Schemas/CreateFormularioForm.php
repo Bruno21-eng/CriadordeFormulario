@@ -32,8 +32,8 @@ class CreateFormularioForm
                         ->modalHeading('Visualização do Formulário')
                         ->modalSubmitAction(false)
                         ->modalWidth('7xl')
-                        
-                        ->modalContent(fn ($get) => view('filament.forms.preview-container', [
+
+                        ->modalContent(fn($get) => view('filament.forms.preview-container', [
                             'paginas' => $get('paginas'),
                             'titulo' => $get('titulo'),
                         ])),
@@ -47,98 +47,118 @@ class CreateFormularioForm
                     ->helperText('Defina uma senha para proteger o acesso ao formulário. Deixe em branco para acesso livre.')
                     ->password()
                     ->columnSpanFull(),
+                Repeater::make('emails')
+                    ->label('Destinatários do Formulário')
+                    ->columnSpanFull()
+                    ->schema([
+                        TextInput::make('email')
+                            ->label('E-mail')
+                            ->email()
+                            ->helperText('Digite os e-mails que receberão o link do formulário, adicione um por um.')
+                            ->required()
+                    ])
+                    ->addActionLabel(label: 'Adicionar Email')
+                    ->reorderable(false)
+                    ->addAction(
+                        fn(Action $action) => $action
+                            ->icon('heroicon-o-plus'),
+                    ),
                 Repeater::make('paginas')
-                ->label('Páginas')
-                ->schema([
-                    Repeater::make('Sessões')
-                        ->inset()
-                        ->schema([
-                            TextInput::make('titulo-sessão')
-                                ->required()
-                                ->label('Título da Sessão')
-                                ->live()
-                                ->afterStateUpdated(fn (string $operation, $state, Set $set) => $operation === 'create'
-                                 ? $set('id-sessao', Str::slug($state)) : null),
-                            TextInput::make('id-sessao')->required()->label('Id da Sessão')->disabled()->dehydrated(),
-                            TextInput::make('descricao')->label('Descrição da Sessão'),
-                            Repeater::make('Elementos')
-                                ->reorderableWithButtons()
-                                ->collapsible()
-                                ->itemLabel(fn (array $state): ?string => $state['tipo-do-elemento'] ?? 'Novo Elemento')
-                                ->schema([
-                                    Select::make('tipo-do-elemento')
-                                        ->options([
-                                            'Texto' => 'Campo de texto',
-                                            'Radio' => 'Botão de opção',
-                                            'RichEditor' => 'Campo de texto avançado',
-                                            'Imagem' => 'Carregar Imagem',
-                                            'Seleção' => 'Caixa de Seleção',
-                                            'Calendário' => 'Campo de Data',
-                                        ])
-                                        ->live()
-                                        ->required(),
-                                    Toggle::make('Obrigatorio')
-                                        ->label('É Obrigatório?')
-                                        ->live()
-                                        ->inline(false)
-                                        ->onColor('success'),
-                                    Section::make()
-                                        ->label('Configurações Básicas')
-                                        ->description('Preencha os detalhes do campo selecionado')
-                                        ->compact()
-                                        ->visible(fn ($get) => in_array($get('tipo-do-elemento'), ['Texto','Radio','RichEditor','Imagem','Seleção', 'Calendário']))
-                                        ->columnSpan(fn($get) => in_array($get('tipo-do-elemento'), ['Texto', 'Imagem', 'RichEditor', 'Calendário']) ? 'full' : 1)
-                                        ->schema([
-                                            TextInput::make('nome-elemento')
-                                                ->label('Nome do Elemento')
-                                                ->required()
-                                                ->placeholder('Ex: Nome Completo')
-                                                ->live()
-                                                ->afterStateUpdated(fn (string $operation, $state, Set $set) => $operation === 'create'
-                                                ? $set('id-elemento', Str::slug($state)) : null),
-                                            TextInput::make('id-elemento')
-                                                ->label('ID do Elemento')
-                                                ->required()
-                                                ->disabled()
-                                                ->dehydrated()
-                                                ->placeholder('Ex: nome-usuario'),
-                                            TextInput::make('descricao-elemento')
-                                                ->label('Descrição do Elemento')
-                                                ->live()
-                                                ->placeholder('Digite uma descrição ou instrução para o usuário (ñ obrigatório)'),
-                                            TextInput::make('placeholder')
-                                                ->label('Placeholder (Dica)')
-                                                ->placeholder('Digite aqui...')
-                                                ->hidden(fn ($get) => in_array($get('tipo-do-elemento'), ['Imagem', 'Seleção', 'Radio', 'Calendário'])),
-                                        ]),
-                                    Repeater::make('opcoes-selecao')
-                                        ->label('Opções da Lista')
-                                        ->schema([
-                                            TextInput::make('opcao-texto')->label('Texto da Opção')->required(),
-                                            TextInput::make('descrição')->label('Descrição da Opção')->hidden(fn ($get) => $get('../../tipo-do-elemento') === 'Seleção'),
-                                        ])
-                                        ->visible(fn ($get) => in_array($get('tipo-do-elemento'), ['Seleção', 'Radio']))
-                                        ->addActionLabel('Adicionar Opção'),
-                                    
-                                ])
-                                ->addActionLabel('Adicionar Elemento')
-                                ->addAction(
-                                    fn (Action $action) => $action->icon('heroicon-s-plus'),
-                                )
-                                ->columns(2),
-                        ])
-                        ->addActionLabel('Adicionar Sessão')
-                        ->addAction(
-                            fn (Action $action) => $action
-                            ->icon('heroicon-m-plus-circle'),
-                        )
-                ])
-                ->addActionLabel('Adicionar Página')
-                ->addAction(
-                    fn (Action $action) => $action->icon('heroicon-s-document-plus'),
-                )
-                ->columnSpanFull()
-            ]);                             
-        }
+                    ->label('Páginas')
+                    ->reorderableWithDragAndDrop(false)
+                    ->reorderableWithButtons()
+                    ->schema([
+                        Repeater::make('Sessões')
+                            ->reorderableWithDragAndDrop(false)
+                            ->reorderableWithButtons()
+                            ->inset()
+                            ->schema([
+                                TextInput::make('titulo-sessão')
+                                    ->required()
+                                    ->label('Título da Sessão')
+                                    ->live()
+                                    ->afterStateUpdated(fn(string $operation, $state, Set $set) => $operation === 'create'
+                                        ? $set('id-sessao', Str::slug($state)) : null),
+                                TextInput::make('id-sessao')->required()->label('Id da Sessão')->disabled()->dehydrated(),
+                                TextInput::make('descricao')->label('Descrição da Sessão'),
+                                Repeater::make('Elementos')
+                                    ->reorderableWithButtons()
+                                    ->collapsible()
+                                    ->itemLabel(fn(array $state): ?string => $state['tipo-do-elemento'] ?? 'Novo Elemento')
+                                    ->schema([
+                                        Select::make('tipo-do-elemento')
+                                            ->options([
+                                                'Texto' => 'Campo de texto',
+                                                'Radio' => 'Botão de opção',
+                                                'RichEditor' => 'Campo de texto avançado',
+                                                'Imagem' => 'Carregar Imagem',
+                                                'Seleção' => 'Caixa de Seleção',
+                                                'Calendário' => 'Campo de Data',
+                                            ])
+                                            ->live()
+                                            ->required(),
+                                        Toggle::make('Obrigatorio')
+                                            ->label('É Obrigatório?')
+                                            ->live()
+                                            ->inline(false)
+                                            ->onColor('success'),
+                                        Section::make()
+                                            ->label('Configurações Básicas')
+                                            ->description('Preencha os detalhes do campo selecionado')
+                                            ->compact()
+                                            ->visible(fn($get) => in_array($get('tipo-do-elemento'), ['Texto', 'Radio', 'RichEditor', 'Imagem', 'Seleção', 'Calendário']))
+                                            ->columnSpan(fn($get) => in_array($get('tipo-do-elemento'), ['Texto', 'Imagem', 'RichEditor', 'Calendário']) ? 'full' : 1)
+                                            ->schema([
+                                                TextInput::make('nome-elemento')
+                                                    ->label('Nome do Elemento')
+                                                    ->required()
+                                                    ->placeholder('Ex: Nome Completo')
+                                                    ->live()
+                                                    ->afterStateUpdated(fn(string $operation, $state, Set $set) => $operation === 'create'
+                                                        ? $set('id-elemento', Str::slug($state)) : null),
+                                                TextInput::make('id-elemento')
+                                                    ->label('ID do Elemento')
+                                                    ->required()
+                                                    ->disabled()
+                                                    ->dehydrated()
+                                                    ->placeholder('Ex: nome-usuario'),
+                                                TextInput::make('descricao-elemento')
+                                                    ->label('Descrição do Elemento')
+                                                    ->live()
+                                                    ->placeholder('Digite uma descrição ou instrução para o usuário (ñ obrigatório)'),
+                                                TextInput::make('placeholder')
+                                                    ->label('Placeholder (Dica)')
+                                                    ->placeholder('Digite aqui...')
+                                                    ->hidden(fn($get) => in_array($get('tipo-do-elemento'), ['Imagem', 'Seleção', 'Radio', 'Calendário'])),
+                                            ]),
+                                        Repeater::make('opcoes-selecao')
+                                            ->label('Opções da Lista')
+                                            ->schema([
+                                                TextInput::make('opcao-texto')->label('Texto da Opção')->required(),
+                                                TextInput::make('descrição')->label('Descrição da Opção')->hidden(fn($get) => $get('../../tipo-do-elemento') === 'Seleção'),
+                                            ])
+                                            ->visible(fn($get) => in_array($get('tipo-do-elemento'), ['Seleção', 'Radio']))
+                                            ->addActionLabel('Adicionar Opção'),
+
+                                    ])
+                                    ->addActionLabel('Adicionar Elemento')
+                                    ->addAction(
+                                        fn(Action $action) => $action->icon('heroicon-s-plus'),
+                                    )
+                                    ->columns(2),
+                            ])
+                            ->addActionLabel('Adicionar Sessão')
+                            ->addAction(
+                                fn(Action $action) => $action
+                                    ->icon('heroicon-m-plus-circle'),
+                            )
+                    ])
+                    ->addActionLabel(label: 'Adicionar Página')
+                    ->addAction(
+                        fn(Action $action) => $action->icon('heroicon-s-document-plus'),
+                    )
+                    ->columnSpanFull()
+            ]);
+    }
 
 }

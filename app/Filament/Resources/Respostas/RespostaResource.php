@@ -8,6 +8,7 @@ use App\Filament\Resources\Respostas\Pages\ListRespostas;
 use App\Filament\Resources\Respostas\Schemas\RespostaForm;
 use App\Filament\Resources\Respostas\Tables\RespostasTable;
 use App\Models\Resposta;
+use App\Filament\Resources\Formularios\Schemas\FormularioForm;
 use BackedEnum;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
