@@ -50,7 +50,7 @@ class FormulariosTable
                     ->alignCenter(),
             ])
             ->recordUrl(function($record) {
-                return "/admin/respostas/create?formulario_id={$record->id}";
+                return route('formulario.publico' , ['id' => $record->id]);
             })
             ->filters([
                 //
@@ -60,7 +60,7 @@ class FormulariosTable
                     ->label('Responder Formulário')
                     ->icon('heroicon-m-pencil')
                     ->color('primary')
-                    ->url(fn ($record) => "/admin/respostas/create?formulario_id={$record->id}"),
+                    ->url(fn ($record) => "admin/respostas/create?formulario_id={$record->id}"),
             ])
             ->recordActions([
 

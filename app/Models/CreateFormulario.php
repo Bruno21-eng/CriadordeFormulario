@@ -11,10 +11,10 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 class CreateFormulario extends Model
 {
     protected $table = 'Createformularios';
-    
-    protected $casts =[
+
+    protected $casts = [
         'paginas' => 'array',
-        'emails'=> 'array',
+        'emails' => 'array',
     ];
     protected $fillable = [
         'user_id',
@@ -24,22 +24,25 @@ class CreateFormulario extends Model
         'emails',
         'paginas',
     ];
-    protected static function booted()
+    /*protected static function booted()
     {
         static::created(function ($createFormulario) {
             // Enviar e-mails para os destinatários
             foreach ($createFormulario->emails as $email) {
+                // Usamos o route() que criamos no web.php para o link público
+                $linkPublico = route('formulario.publico', ['id' => $createFormulario->id]);
+
                 Mail::to($email['email'])->send(new LinkFormularioMail(
                     titulo: $createFormulario->titulo,
-                    url: route('formulario.show', ['id' => $createFormulario->id])
+                    url: $linkPublico
                 ));
             }
         });
-    }
+    }*/
     public function respostas(): HasMany
-{
-    // Relaciona com o model que guarda os preenchimentos (Formulario)
-    // usando a chave estrangeira que você definiu na migration
-    return $this->hasMany(Formulario::class, 'Createformulario_id');
-}
+    {
+        // Relaciona com o model que guarda os preenchimentos (Formulario)
+        // usando a chave estrangeira que você definiu na migration
+        return $this->hasMany(Formulario::class, 'Createformulario_id');
+    }
 }
