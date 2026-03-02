@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class Resposta extends Model
 {
     protected $fillable = [
-        'Createformulario_id',
+        'createformulario_id',
         'respostas',
         'user_id',
     ];
@@ -16,8 +16,8 @@ class Resposta extends Model
         'respostas' => 'array',
     ];
 
-    public function formulario() : BelongsTo
+    public function formulario(): BelongsTo
     {
-        return $this->belongsTo(Formulario::class);
+        return $this->belongsTo(CreateFormulario::class, 'createformulario_id');
     }
 }

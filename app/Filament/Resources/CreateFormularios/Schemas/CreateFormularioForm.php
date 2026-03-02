@@ -33,9 +33,14 @@ class CreateFormularioForm
                         ->modalSubmitAction(false)
                         ->modalWidth('7xl')
 
-                        ->modalContent(fn($get) => view('filament.forms.preview-container', [
-                            'paginas' => $get('paginas'),
-                            'titulo' => $get('titulo'),
+                        ->modalContent(fn($get) => view('formularios.publico', [
+                            // Criamos um objeto genérico para a View não reclamar
+                            'formulario' => (object) [
+                                'id' => null, // No preview não tem ID ainda
+                                'titulo' => $get('titulo') ?? 'Título do Formulário',
+                                'paginas' => $get('paginas') ?? [],
+                            ],
+                            'isPreview' => true, // Uma flag para desabilitar o botão de enviar no preview
                         ])),
                 ]),
                 TextInput::make('titulo')

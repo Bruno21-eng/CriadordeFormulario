@@ -1,5 +1,9 @@
-<script src="https://cdn.tailwindcss.com"></script>
-
+@vite(['resources/css/app.css', 'resources/js/app.js'])
+@php
+    // Se isPreview existir e for verdadeiro, $visu é true, senão é false
+    $visu = isset($isPreview) && $isPreview;
+    $action = $visu ? '#' : route('formulario.responder', $formulario->id);
+@endphp
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -20,9 +24,17 @@
             @endif
         </div>
 
-        <form action="{{ route('formulario.responder', $formulario->id) }}" method="POST" enctype="multipart/form-data" class="mt-6 space-y-6">
+        @php
+            $action = isset($isPreview) ? '#' : route('formulario.responder', $formulario->id);
+        @endphp
+        <form action="{{ $action }}" method="POST" enctype="multipart/form-data" class="mt-6 space-y-6">
             @csrf
-            
+            @if(isset($isPreview))
+                <div class="p-4 bg-blue-50 border-l-4 border-blue-400 text-blue-700 mb-10">
+                    <strong>Modo de Visualização:</strong> Os botões e envios estão desabilitados.
+                </div>
+                
+            @endif
             @foreach($formulario->paginas as $pagina)
                 @foreach($pagina['Sessões'] as $sessao)
                     <div class="bg-white p-8 shadow-sm rounded-lg">
@@ -31,6 +43,12 @@
 
                         <div class="space-y-6">
                             @foreach($sessao['Elementos'] as $elemento)
+                            @php
+                                // Definimos as variáveis LOGO AQUI para serem usadas em qualquer @case
+                                $idElemento = $elemento['id-elemento'] ?? 'temp-' . $loop->index;
+                                $fieldName = "respostas[{$idElemento}]";
+                            @endphp
+                            
                                 <div>
                                     <label class="block text-gray-700 font-bold mb-2">
                                         {{ $elemento['nome-elemento'] }}
@@ -45,9 +63,10 @@
 
                                     @switch($elemento['tipo-do-elemento'])
                                         @case('Texto')
-                                            <input type="text" name="{{ $fieldName }}" placeholder="{{ $elemento['placeholder'] }}"
+                                            <input type="text" name="{{ $fieldName }}" @disabled($visu) placeholder="{{ $elemento['placeholder'] }}"
                                                 class="w-full border-gray-300 rounded-lg shadow-sm focus:ring-yellow-500 focus:border-yellow-500 border p-3"
                                                 {{ $elemento['Obrigatorio'] ? 'required' : '' }}>
+                                                
                                             @break
 
                                         @case('Calendário')
@@ -77,7 +96,7 @@
                                             @break
 
                                         @case('RichEditor')
-                                            <textarea name="{{ $fieldName }}" rows="4" 
+                                            <textarea name="{{ $fieldName }}" rows="4" @disabled($visu)
                                                 class="w-full border-gray-300 rounded-lg shadow-sm border p-3"
                                                 placeholder="{{ $elemento['placeholder'] }}"></textarea>
                                             @break
@@ -86,19 +105,24 @@
                                             <div class="mt-2">
                                                 <label class="flex flex-col items-center justify-center w-full h-32 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100 transition duration-200">
                                                     <div class="flex flex-col items-center justify-center pt-5 pb-6">
-                                                        <svg class="w-8 h-8 mb-4 text-gray-500" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 16">
-                                                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 13h3a3 3 0 0 0 0-6h-.025A5.56 5.56 0 0 0 16 6.5 5.5 5.5 0 0 0 5.207 5.021C5.137 5.017 5.071 5 5 5a4 4 0 0 0 0 8h2.167M10 15V6m0 0L8 8m2-2 2 2"/>
+                                                        <svg class="w-8 h-8 mb-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
                                                         </svg>
                                                         <p class="mb-2 text-sm text-gray-500 font-semibold">Clique para fazer upload</p>
-                                                        <p class="text-xs text-gray-400">PNG, JPG ou JPEG</p>
                                                     </div>
+                                                    
+                                                    {{-- Agora o ID vai funcionar corretamente --}}
                                                     <input type="file" 
                                                         name="{{ $fieldName }}" 
+                                                        @disabled($visu)
+                                                        id="file_{{ $idElemento }}"
+                                                        onchange="updateFileName(this, 'label_{{ $idElemento }}')"
                                                         accept="image/*" 
                                                         class="hidden" 
                                                         {{ $elemento['Obrigatorio'] ? 'required' : '' }} />
                                                 </label>
-                                            </div>                                            
+                                                {{-- Esse parágrafo mostrará o nome do arquivo selecionado --}}
+                                                <p id="label_{{ $idElemento }}" class="mt-2 text-sm text-blue-600 font-medium"></p>                                            
                                         @break
                                     @endswitch
                                 </div>
@@ -107,14 +131,24 @@
                     </div>
                 @endforeach
             @endforeach
-
-            <div class="flex justify-end pb-12">
-                <button type="submit" class="bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-3 px-10 rounded-lg shadow-md transition duration-200">
-                    Enviar Respostas
-                </button>
-            </div>
+            @if(!isset($isPreview))
+                <div class="flex justify-end pb-12">
+                    <button type="submit" class="bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-3 px-10 rounded-lg shadow-md transition duration-200">
+                        Enviar Respostas
+                    </button>
+                </div>
+            @endif
         </form>
     </div>
-
+<script>
+    function updateFileName(input, labelId) {
+        const label = document.getElementById(labelId);
+        if (input.files.length > 0) {
+            label.innerText = "✅ Arquivo selecionado: " + input.files[0].name;
+        } else {
+            label.innerText = "";
+        }
+    }
+</script>
 </body>
 </html>

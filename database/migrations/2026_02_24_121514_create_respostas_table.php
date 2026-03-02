@@ -13,6 +13,9 @@ return new class extends Migration
     {
         Schema::create('respostas', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('createformulario_id')->constrained('Createformularios')->onDelete('cascade');
+            $table->foreignId('user_id')->nullable()->constrained('users')->onDelete('set null');
+            $table->jsonb('respostas');
             $table->timestamps();
         });
     }
