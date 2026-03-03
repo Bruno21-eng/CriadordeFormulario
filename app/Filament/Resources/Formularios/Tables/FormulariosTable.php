@@ -5,8 +5,9 @@ namespace App\Filament\Resources\Formularios\Tables;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Tables\Columns\TextColumn;
-use Filament\Actions\EditAction;
+use Filament\Forms\Components\TextInput;
 use Filament\Actions\Action;
+use Filament\Notifications\Notification;
 use Filament\Tables\Table;
 use Filament\Tables\Columns\IconColumn;
 
@@ -26,7 +27,7 @@ class FormulariosTable
                 TextColumn::make('paginas')
                     ->label('Páginas')
                     ->getStateUsing(function ($record) {
-                        return is_array($record->paginas)? count($record->paginas):1;
+                        return is_array($record->paginas) ? count($record->paginas) : 1;
                     })
                     ->badge()
                     ->color('primary'),
@@ -39,32 +40,51 @@ class FormulariosTable
                     ->label('Data de Criação')
                     ->dateTime('d/m/Y H:i'),
                 IconColumn::make('senha')
-                    ->label('Acesso')
-                    ->getStateUsing(fn ($record) => !empty($record->senha)) 
+                    ->label('Protegido')
+                    ->getStateUsing(fn($record) => !empty($record->senha))
                     ->boolean()
-                    // No Filament, usamos strings para os ícones
-                    ->trueIcon('heroicon-m-lock-closed') 
+                    ->trueIcon('heroicon-m-lock-closed')
                     ->falseIcon('heroicon-m-lock-open')
-                    ->trueColor('danger')  // Vermelho para bloqueado
-                    ->falseColor('success') // Verde para aberto
+                    ->trueColor('danger')
+                    ->falseColor('success')
                     ->alignCenter(),
             ])
-            ->recordUrl(function($record) {
-                return route('formulario.publico' , ['id' => $record->id]);
+            ->recordUrl(function ($record) {
             })
             ->filters([
                 //
             ])
             ->actions([
                 Action::make('responder')
-                    ->label('Responder Formulário')
+                    ->label('Responder')
                     ->icon('heroicon-m-pencil')
                     ->color('primary')
-                    ->url(fn ($record) => "admin/respostas/create?formulario_id={$record->id}"),
-            ])
-            ->recordActions([
-
-                EditAction::make(),
+                    
+                    // A mágica acontece aqui:
+                    ->mountUsing(function (Action $action, \App\Models\CreateFormulario $record) {
+                        if (empty($record->senha)) {
+                            return redirect()->to(route('formulario.publico', $record));
+                        }
+                    })
+                    // Se tiver senha, ele pede os dados abaixo:
+                    ->form([
+                        TextInput::make('senha_digitada')
+                            ->label('Este formulário precisa de Senha')
+                            ->password()
+                            ->placeholder('Digite a senha para acessar')
+                            ->required(),
+                    ])
+                    ->action(function (\App\Models\CreateFormulario $record, array $data) {
+                        // Verifica se a senha está correta
+                        if ($data['senha_digitada'] === $record->senha) {
+                            return redirect()->to(route('formulario.publico', $record));
+                        }
+                        // Se errar, manda uma notificação
+                        Notification::make()
+                            ->title('Senha Incorreta')
+                            ->danger()
+                            ->send();
+                    }),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
