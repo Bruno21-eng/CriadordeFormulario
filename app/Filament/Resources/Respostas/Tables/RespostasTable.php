@@ -19,20 +19,13 @@ class RespostasTable
             ->columns([
                 TextColumn::make("id")
                 ->label('resposta n°'),
-                TextColumn::make('user.name')
-                    ->label('Nome do Usuário')
-                    ->placeholder('Anônimo')
-                    ->searchable()
-                    ->sortable(),
-
-                TextColumn::make('formulario.titulo')
-                    ->label('Formulário')
-                    ->searchable()
-                    ->sortable(),
-
                 TextColumn::make('created_at')
                     ->label('Data da Resposta')
                     ->dateTime('d/m/Y H:i')
+                    ->sortable(),
+                TextColumn::make('formulario.titulo')
+                    ->label('Formulário')
+                    ->searchable()
                     ->sortable(),
                 TextColumn::make('formulario.criador_nome')
                 ->label('Criador do Formulário')
@@ -41,9 +34,9 @@ class RespostasTable
             ->filters([
                 //
             ])
+            ->recordAction(ViewAction::class) 
             
-            ->recordActions([
-                // Agora usamos a classe importada diretamente
+            ->actions([
                 ViewAction::make(),
             ])
             ->bulkActions([
@@ -52,4 +45,5 @@ class RespostasTable
                 ]),
             ]);
     }
+
 }

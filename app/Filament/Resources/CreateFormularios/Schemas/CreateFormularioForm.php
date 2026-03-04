@@ -9,6 +9,8 @@ use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\TextInput;
 use Filament\Actions\Action;
 use Filament\Schemas\Components\Actions;
+use App\Mail\EnviarFormMail;
+use Illuminate\Support\Facades\Mail;
 use Filament\Actions\Action as FormAction;
 use Filament\Schemas\Components\Section;
 use Illuminate\Support\Str;

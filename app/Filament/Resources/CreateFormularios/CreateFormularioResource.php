@@ -14,6 +14,10 @@ use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
 
+
+use App\Mail\EnviarFormMail;
+use Illuminate\Support\Facades\Mail;
+
 class CreateFormularioResource extends Resource
 {
     protected static ?string $model = CreateFormulario::class;
@@ -44,9 +48,9 @@ class CreateFormularioResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => ListCreateFormularios::route('/'),
-            'create' => CreateCreateFormulario::route('/create'),
-            'edit' => EditCreateFormulario::route('/{record}/edit'),
+            'index' => Pages\ListCreateFormularios::route('/'),
+            'create' => Pages\CreateCreateFormulario::route('/create'),
+            'edit' => Pages\EditCreateFormulario::route('/{record}/edit'),
         ];
     }
 }

@@ -2,27 +2,28 @@
 
 namespace App\Filament\Resources\Respostas;
 
-use App\Filament\Resources\Respostas\Pages\CreateResposta;
-use App\Filament\Resources\Respostas\Pages\EditResposta;
-use App\Filament\Resources\Respostas\Pages\ListRespostas;
+use App\Models\Resposta;
+use App\Filament\Resources\Respostas\Pages;
 use App\Filament\Resources\Respostas\Schemas\RespostaForm;
 use App\Filament\Resources\Respostas\Tables\RespostasTable;
-use App\Models\Resposta;
-use App\Filament\Resources\Formularios\Schemas\FormularioForm;
-use BackedEnum;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
-use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
+use Filament\Infolists\Infolist;
+use BackedEnum;
+use Filament\Infolists\Components\Section;
+use Filament\Infolists\Components\TextEntry;
+use Filament\Infolists\Components\KeyValueEntry;
 
 class RespostaResource extends Resource
 {
     protected static ?string $model = Resposta::class;
 
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedClipboardDocumentCheck;
+    protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-clipboard-document-check';
 
-    protected static ?string $recordTitleAttribute = 'RespostaResource';
-
+    // Se o erro no Form persistir, verifique se o RespostaForm::configure
+    // está aceitando (Form $form) como argumento.
+    
     public static function form(Schema $schema): Schema
     {
         return RespostaForm::configure($schema);
@@ -33,19 +34,13 @@ class RespostaResource extends Resource
         return RespostasTable::configure($table);
     }
 
-    public static function getRelations(): array
-    {
-        return [
-            //
-        ];
-    }
 
     public static function getPages(): array
     {
         return [
-            'index' => ListRespostas::route('/'),
-            'create' => CreateResposta::route('/create'),
-            'edit' => EditResposta::route('/{record}/edit'),
+            'index' => Pages\ListRespostas::route('/'),
+            'create' => Pages\CreateResposta::route('/create'),
+            'edit' => Pages\EditResposta::route('/{record}/edit'),
         ];
     }
 }
