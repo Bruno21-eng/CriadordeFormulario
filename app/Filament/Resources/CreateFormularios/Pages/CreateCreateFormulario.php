@@ -23,10 +23,12 @@ class CreateCreateFormulario extends CreateRecord
         $formulario = $this->record;
         $emails = $formulario->emails;
         if ($emails) {
+            $urlFormulario = route('formulario.publico', $formulario);
+
             foreach ($emails as $item) {
                 $enderecoDestino = $item['email'];
 
-                Mail::to($enderecoDestino)->send(new EnviarFormMail($formulario->titulo));
+                Mail::to($enderecoDestino)->send(new EnviarFormMail($formulario->titulo, $urlFormulario));
             }
         }
     }

@@ -12,19 +12,23 @@ class EnviarFormMail extends Mailable
 {
     use Queueable, SerializesModels;
 
-    public function __construct(public $titulo) {}
+    // Adicione a variável $url aqui
+    public function __construct(
+        public $titulo,
+        public $url
+    ) {}
 
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Bem-vindo ao Sistema de Formulários',
+            subject: 'Novo Formulário Disponível: ' . $this->titulo,
         );
     }
 
     public function content(): Content
     {
         return new Content(
-            view: 'emails.enviar-form', // Vamos criar essa view agora
+            view: 'emails.enviar-form',
         );
     }
 }
