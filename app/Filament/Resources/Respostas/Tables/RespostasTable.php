@@ -35,7 +35,7 @@ class RespostasTable
                 //
             ])
             ->recordAction(ViewAction::class) 
-            
+
             ->actions([
                 ViewAction::make(),
             ])
@@ -46,4 +46,5 @@ class RespostasTable
             ]);
     }
 
+    
 }

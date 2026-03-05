@@ -9,7 +9,22 @@
                         {{ $pergunta }}
                     </div>
                     <div class="w-2/3 p-3 bg-white text-gray-600 text-sm italic">
-                        {{ is_array($resposta) ? implode(', ', $resposta) : $resposta }}
+                        @php
+                            // Verifica se a resposta é uma string e se termina com extensão de imagem
+                            $isImage = is_string($resposta) && preg_match('/\.(jpg|jpeg|png|webp|gif|svg)$/i', $resposta);
+                        @endphp
+
+                        @if($isImage)
+                            <div class="mt-1">
+                                <a href="{{ Storage::url($resposta) }}" target="_blank" class="inline-block">
+                                    <img src="{{ Storage::url($resposta) }}" alt="Imagem"
+                                        class="max-h-32 w-auto rounded border shadow-sm hover:opacity-75 transition">
+                                </a>
+                                <span class="block text-xs text-gray-400 mt-1">Clique na imagem para ampliar</span>
+                            </div>
+                        @else
+                            {{ is_array($resposta) ? implode(', ', $resposta) : $resposta }}
+                        @endif
                     </div>
                 </div>
             @endforeach
