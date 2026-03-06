@@ -32,27 +32,26 @@
                 <span class="text-xl font-bold">{{ $titulo ?? 'Sem Título' }}</span>
             </x-slot>
 
-            <div class="flex flex-col gap-y-6 "> {{-- Container para as sessões --}}
-                @foreach($pagina['Sessões'] ?? [] as $sessao)
+            <div class="flex flex-col gap-y-6 "> 
+                @foreach($pagina['Seções'] ?? [] as $seção)
                     <x-filament::section>
                         <x-slot name="heading">
-                            <span class="text-lg font-semibold">{{ $sessao['titulo-sessão'] ?? 'Sessão sem título' }}</span>
+                            <span class="text-lg font-semibold">{{ $seção['titulo-seção'] ?? 'Seção sem título' }}</span>
                         </x-slot>
 
-                        {{-- Container da sessão --}}
                         <div class="p-6 border rounded-xl ">
                             
-                            @if(!empty($sessao['descricao']))
+                            @if(!empty($seção['descricao']))
                                 <div class="mb-6 border-l-4 border-primary-500 pl-4">
                                     <p class="text-base text-gray-600 dark:text-gray-400">
-                                        {{ $sessao['descricao'] }}
+                                        {{ $seção['descricao'] }}
                                     </p>
                                 </div>
                             @endif
 
                             {{-- Grid de Elementos - Removido Style inline, usando classes v4 --}}
                             <div class="grid grid-cols-1 gap-6">
-                                @foreach($sessao['Elementos'] ?? [] as $elemento)
+                                @foreach($seção['Elementos'] ?? [] as $elemento)
                                     @php
                                         $tipo = $elemento['tipo-do-elemento'] ?? '';
                                         $nome_exibicao = $elemento['nome-elemento'] ?? 'Campo sem nome';

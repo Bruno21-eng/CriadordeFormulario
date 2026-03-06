@@ -74,19 +74,19 @@ class FormularioForm
         ];
 
         foreach ($config->paginas as $pagina) {
-            $sessoes = $pagina['Sessões'] ?? [];
+            $seções = $pagina['Seções'] ?? [];
             
-            foreach ($sessoes as $sessao) {
-                $camposDaSessao = [];
-                $elementos = $sessao['Elementos'] ?? [];
+            foreach ($seções as $seção) {
+                $camposDaSeção = [];
+                $elementos = $seção['Elementos'] ?? [];
 
                 foreach ($elementos as $elemento) {
-                    $camposDaSessao[] = self::ElementoParaComponente($elemento);
+                    $camposDaSeção[] = self::ElementoParaComponente($elemento);
                 }
 
-                $components[] = Section::make($sessao['titulo-sessão'] ?? 'Dados')
-                    ->description($sessao['descricao'] ?? '')
-                    ->schema($camposDaSessao);
+                $components[] = Section::make($seção['titulo-seção'] ?? 'Dados')
+                    ->description($seção['descricao'] ?? '')
+                    ->schema($camposDaSeção);
             }
         }
 

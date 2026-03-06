@@ -71,24 +71,24 @@ class CreateFormularioForm
                             ->icon('heroicon-o-plus'),
                     ),
                 Repeater::make('paginas')
-                    ->aboveContent('Quantas páginas o seu formulário precisará?')
+                    ->aboveContent(components: 'Quantas páginas o seu formulário precisará?')
                     ->label('Páginas')
                     ->reorderableWithDragAndDrop(false)
                     ->reorderableWithButtons()
                     ->schema([
-                        Repeater::make('Sessões')
+                        Repeater::make('Seções')
                             ->reorderableWithDragAndDrop(false)
                             ->reorderableWithButtons()
                             ->inset()
                             ->schema([
-                                TextInput::make('titulo-sessão')
+                                TextInput::make('titulo-seção')
                                     ->required()
-                                    ->label('Título da Sessão')
+                                    ->label('Título da Seção')
                                     ->live()
                                     ->afterStateUpdated(fn(string $operation, $state, Set $set) => $operation === 'create'
-                                        ? $set('id-sessao', Str::slug($state)) : null),
-                                TextInput::make('id-sessao')->required()->label('Id da Sessão')->disabled()->dehydrated(),
-                                TextInput::make('descricao')->label('Descrição da Sessão'),
+                                        ? $set('id-seção', Str::slug($state)) : null),
+                                TextInput::make('id-seção')->required()->label('Id da Seção')->disabled()->dehydrated(),
+                                TextInput::make('descricao')->label('Descrição da Seção'),
                                 Repeater::make('Elementos')
                                     ->reorderableWithButtons()
                                     ->collapsible()
@@ -103,9 +103,11 @@ class CreateFormularioForm
                                                 'Seleção' => 'Caixa de Seleção',
                                                 'Calendário' => 'Campo de Data',
                                             ])
-                                            ->live(),
+                                            ->live()
+                                            ->required(),
                                         Toggle::make('Obrigatorio')
                                             ->label('É Obrigatório?')
+                                            ->belowContent(components: 'Não se esqueça de informar se é Obrigatório ou não.')
                                             ->live()
                                             ->inline(false)
                                             ->onColor('success'),
@@ -154,7 +156,7 @@ class CreateFormularioForm
                                     )
                                     ->columns(2),
                             ])
-                            ->addActionLabel('Adicionar Sessão')
+                            ->addActionLabel('Adicionar Seção')
                             ->addAction(
                                 fn(Action $action) => $action
                                     ->icon('heroicon-m-plus-circle'),
