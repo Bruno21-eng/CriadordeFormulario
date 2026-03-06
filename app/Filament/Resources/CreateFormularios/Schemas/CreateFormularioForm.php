@@ -61,8 +61,8 @@ class CreateFormularioForm
                         TextInput::make('email')
                             ->label('E-mail')
                             ->email()
-                            ->helperText('Digite os e-mails que receberão o link do formulário, adicione um por um.')
                             ->required()
+                            ->helperText('Digite os e-mails que receberão o link do formulário, adicione um por um.')
                     ])
                     ->addActionLabel(label: 'Adicionar Email')
                     ->reorderable(false)
@@ -71,6 +71,7 @@ class CreateFormularioForm
                             ->icon('heroicon-o-plus'),
                     ),
                 Repeater::make('paginas')
+                    ->aboveContent('Quantas páginas o seu formulário precisará?')
                     ->label('Páginas')
                     ->reorderableWithDragAndDrop(false)
                     ->reorderableWithButtons()
@@ -102,8 +103,7 @@ class CreateFormularioForm
                                                 'Seleção' => 'Caixa de Seleção',
                                                 'Calendário' => 'Campo de Data',
                                             ])
-                                            ->live()
-                                            ->required(),
+                                            ->live(),
                                         Toggle::make('Obrigatorio')
                                             ->label('É Obrigatório?')
                                             ->live()
@@ -136,7 +136,7 @@ class CreateFormularioForm
                                                 TextInput::make('placeholder')
                                                     ->label('Placeholder (Dica)')
                                                     ->placeholder('Digite aqui...')
-                                                    ->hidden(fn($get) => in_array($get('tipo-do-elemento'), ['Imagem', 'Seleção', 'Radio', 'Calendário'])),
+                                                    ->hidden(condition: fn($get) => in_array($get('tipo-do-elemento'), ['Imagem', 'Seleção', 'Radio', 'Calendário'])),
                                             ]),
                                         Repeater::make('opcoes-selecao')
                                             ->label('Opções da Lista')

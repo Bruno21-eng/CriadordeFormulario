@@ -40,9 +40,6 @@ class RespostasTable
                 ViewAction::make(),
             ])
             ->bulkActions([
-                BulkActionGroup::make([
-                    DeleteBulkAction::make(),
-                ]),
             ]);
     }
 

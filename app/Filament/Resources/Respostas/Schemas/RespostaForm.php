@@ -3,14 +3,11 @@
 namespace App\Filament\Resources\Respostas\Schemas;
 
 use App\Models\CreateFormulario;
+use App\Models\Resposta;
 use Filament\Schemas\Schema;
 use Filament\Forms\Components\Select;
 use Filament\Schemas\Components\Section;
-use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Placeholder;
-use Filament\Forms\Components\DatePicker;
-use Filament\Forms\Components\RichEditor;
-use Filament\Forms\Components\Radio;
 
 class RespostaForm
 {
@@ -18,88 +15,66 @@ class RespostaForm
     {
         return $schema
             ->components([
-                Section::make('Informações da Resposta')
+                // SEÇÃO 1: SELETOR DE MODELO (Apenas na Criação)
+                Section::make('Filtro de Histórico')
+                    ->description('Selecione um formulário para ver todas as respostas já enviadas.')
                     ->columnSpanFull()
+                    ->hidden(fn($record) => $record !== null) // ESCONDE se estiver visualizando um item já salvo
                     ->schema([
-                        // SÓ MOSTRA O SELECT SE FOR UM NOVO REGISTRO (CREATE)
                         Select::make('formulario_id')
                             ->label('Selecione o Modelo de Formulário')
                             ->options(CreateFormulario::all()->pluck('titulo', 'id'))
                             ->live()
                             ->required()
-                            ->hidden(fn($record) => $record !== null) // Esconde se já existir um registro
-                            ->afterStateUpdated(fn($set) => $set('respostas', [])),
+                            ->native(false),
+                    ]),
 
-                        // SÓ MOSTRA O CONTEÚDO SE O REGISTRO JÁ EXISTIR (VIEW/EDIT)
-                        Placeholder::make('respostas_view')
-                            ->label('Conteúdo Preenchido')
-                            ->visible(fn($record) => $record !== null) // Só aparece se tiver registro
-                            ->content(function($record) {
-                                if (!$record) return ''; // Segurança extra
-                                
+                // SEÇÃO 2: VISUALIZAÇÃO DE ITEM ÚNICO (Apenas ao clicar em "Visualizar" na Tabela)
+                Section::make('Conteúdo da Resposta')
+                    ->columnSpanFull()
+                    ->visible(fn($record) => $record !== null) // SÓ APARECE se já existir um registro (View Mode)
+                    ->schema([
+                        Placeholder::make('resposta_view')
+                            ->label(fn($record) => "Resposta enviada por: " . ($record->user?->name ?? 'Usuário Anônimo'))
+                            ->content(function ($record) {
                                 return view('filament.components.respostas-list', [
                                     'respostas' => $record->respostas
                                 ]);
                             }),
                     ]),
 
-                // ESTA SEÇÃO SÓ APARECE NA CRIAÇÃO, APÓS SELECIONAR UM FORMULÁRIO
-                Section::make('Campos para Preencher')
+                // SEÇÃO 3: LISTAGEM HISTÓRICA (Apenas na Criação, após selecionar o modelo)
+                Section::make('Histórico de Envios')
+                    ->description('Veja abaixo tudo o que já foi respondido para este modelo.')
+                    ->columnSpanFull()
                     ->visible(fn($get, $record) => $record === null && $get('formulario_id') !== null)
                     ->schema(function ($get) {
                         $formularioId = $get('formulario_id');
-                        if (!$formularioId) return [];
 
-                        $formulario = CreateFormulario::find($formularioId);
-                        if (!$formulario || !isset($formulario->paginas)) return [];
+                        $envios = Resposta::where('createformulario_id', $formularioId)
+                            ->with('user')
+                            ->latest()
+                            ->get();
 
-                        $camposDinamicos = [];
-
-                        foreach ($formulario->paginas as $pagina) {
-                            foreach ($pagina['Sessões'] as $sessao) {
-                                foreach ($sessao['Elementos'] as $elemento) {
-                                    $camposDinamicos[] = self::gerarCampo($elemento);
-                                }
-                            }
+                        if ($envios->isEmpty()) {
+                            return [
+                                Placeholder::make('aviso')
+                                    ->label('')
+                                    ->content('Nenhuma resposta encontrada para este modelo ainda.')
+                            ];
                         }
 
-                        return $camposDinamicos;
+                        $componentes = [];
+                        foreach ($envios as $envio) {
+                            $componentes[] = Placeholder::make('envio_' . $envio->id)
+                                ->label("Enviado por: " . ($envio->user?->name ?? 'Anônimo') . " - " . $envio->created_at->format('d/m/Y H:i'))
+                                ->content(fn() => view('filament.components.respostas-list', [
+                                    'respostas' => $envio->respostas
+                                ]));
+                        }
+
+                        return $componentes;
                     }),
             ]);
-    }
-
-    protected static function gerarCampo(array $elemento)
-    {
-        $nomeParaSalvar = "respostas." . ($elemento['id-elemento'] ?? 'campo');
-        $label = $elemento['nome-elemento'] ?? 'Sem título';
-
-        return match ($elemento['tipo-do-elemento']) {
-            'Texto' => TextInput::make($nomeParaSalvar)
-                ->label($label)
-                ->placeholder($elemento['placeholder'] ?? '')
-                ->required($elemento['Obrigatorio'] ?? false),
-
-            'Calendário' => DatePicker::make($nomeParaSalvar)
-                ->label($label)
-                ->required($elemento['Obrigatorio'] ?? false),
-
-            'RichEditor' => RichEditor::make($nomeParaSalvar)
-                ->label($label)
-                ->columnSpanFull(),
-
-            'Radio' => Radio::make($nomeParaSalvar)
-                ->label($label)
-                ->options(collect($elemento['opcoes-selecao'] ?? [])->pluck('opcao-texto', 'opcao-texto')->toArray())
-                ->required($elemento['Obrigatorio'] ?? false),
-
-            'Seleção' => Select::make($nomeParaSalvar)
-                ->label($label)
-                ->options(collect($elemento['opcoes-selecao'] ?? [])->pluck('opcao-texto', 'opcao-texto')->toArray())
-                ->required($elemento['Obrigatorio'] ?? false),
-
-            default => Placeholder::make($nomeParaSalvar)
-                ->label($label)
-                ->content('Tipo de campo não suportado no Admin'),
-        };
     }
 }
