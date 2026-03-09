@@ -18,9 +18,11 @@ class RespostasTable
         return $table
             ->columns([
                 TextColumn::make("id")
-                ->label('resposta n°'),
+                    ->label('resposta n°')
+                    ->sortable(),
                 TextColumn::make('created_at')
                     ->label('Data da Resposta')
+                    ->searchable()
                     ->dateTime('d/m/Y H:i')
                     ->sortable(),
                 TextColumn::make('formulario.titulo')
@@ -28,13 +30,14 @@ class RespostasTable
                     ->searchable()
                     ->sortable(),
                 TextColumn::make('formulario.criador_nome')
-                ->label('Criador do Formulário')
-                ->alignCenter(),
+                    ->searchable()
+                    ->label('Criador do Formulário')
+                    ->alignCenter(),
             ])
             ->filters([
                 //
             ])
-            ->recordAction(ViewAction::class) 
+            ->recordAction(ViewAction::class)
 
             ->actions([
                 ViewAction::make(),
@@ -43,5 +46,5 @@ class RespostasTable
             ]);
     }
 
-    
+
 }

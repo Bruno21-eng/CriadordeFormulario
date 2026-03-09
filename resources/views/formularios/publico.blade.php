@@ -30,7 +30,7 @@
         @php
             $action = isset($isPreview) ? '#' : route('formulario.responder', $formulario->id);
         @endphp
-        <form x-data="{ step: 0, totalSteps: {{ count($formulario->paginas) - 1 }} }" action="{{ $action }}" method="POST" enctype="multipart/form-data" class="mt-6 space-y-6">
+        <form x-data="{ step: 0, totalSteps: {{ count($formulario->paginas) - 1 }} }" @keydown.enter.prevent action="{{ $action }}" method="POST" enctype="multipart/form-data" class="mt-6 space-y-6">
             @csrf
             @if(isset($isPreview))
                 <div class="p-4 bg-blue-50 border-l-4 border-blue-400 text-blue-700 mb-10">

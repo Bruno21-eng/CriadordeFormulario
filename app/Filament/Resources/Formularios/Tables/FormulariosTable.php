@@ -25,6 +25,7 @@ class FormulariosTable
                     ->label('Criado por'),
 
                 TextColumn::make('paginas')
+                    ->searchable()
                     ->label('Páginas')
                     ->getStateUsing(function ($record) {
                         return is_array($record->paginas) ? count($record->paginas) : 1;
@@ -38,6 +39,7 @@ class FormulariosTable
                     ->color('success'),
                 TextColumn::make('created_at')
                     ->label('Data de Criação')
+                    ->searchable(true)
                     ->dateTime('d/m/Y H:i'),
                 IconColumn::make('senha')
                     ->label('Protegido')

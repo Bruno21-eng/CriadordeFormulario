@@ -109,6 +109,7 @@ class CreateFormularioForm
                                             ->label('É Obrigatório?')
                                             ->belowContent(components: 'Não se esqueça de informar se é Obrigatório ou não.')
                                             ->live()
+                                            ->default(true)
                                             ->inline(false)
                                             ->onColor('success'),
                                         Section::make()
