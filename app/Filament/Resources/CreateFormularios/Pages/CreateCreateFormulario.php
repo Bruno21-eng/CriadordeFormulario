@@ -12,6 +12,10 @@ class CreateCreateFormulario extends CreateRecord
 {
     protected static string $resource = CreateFormularioResource::class;
 
+    public function getTitle(): string
+    {
+        return "Criação de Formulários";
+    }
     protected function mutateFormDataBeforeCreate(array $data): array
     {
         $data['user_id'] = auth()->id();

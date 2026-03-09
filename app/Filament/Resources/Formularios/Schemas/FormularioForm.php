@@ -73,7 +73,24 @@ class FormularioForm
             Hidden::make('Createformulario_id')->default($CreateformularioId)
         ];
 
-        foreach ($config->paginas as $pagina) {
+        $totalPaginas = count($config->paginas);
+
+        foreach ($config->paginas as $index => $pagina) {
+            if ($totalPaginas > 1) {
+                $numeroPagina = $index + 1;
+                
+                $components[] = Placeholder::make('.')
+                    ->content(new HtmlString("
+                        <div class='flex items-center space-x-2 bg-gray-100 w-fit px-4 py-2 rounded-full border border-gray-200 shadow-sm mb-4'>
+                            <span class='flex h-3 w-3 rounded-full bg-yellow-400 animate-pulse'></span>
+                            <span class='text-xs font-bold uppercase tracking-widest text-gray-600'>
+                                Visualizando: Página {$numeroPagina} de {$totalPaginas}
+                            </span>
+                        </div>"   
+                    ));
+            }    
+
+
             $seções = $pagina['Seções'] ?? [];
             
             foreach ($seções as $seção) {

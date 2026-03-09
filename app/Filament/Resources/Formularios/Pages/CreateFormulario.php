@@ -9,6 +9,15 @@ class CreateFormulario extends CreateRecord
 {
     protected static string $resource = FormularioResource::class;
 
+    protected function getFormActions(): array
+    {
+        return [
+            $this->getCancelFormAction()
+                ->label('Voltar')
+                ->color('gray')
+                ->icon('heroicon-m-arrow-left'),
+        ];
+    }
     public function getTitle(): string
     {
         return "Visualizar Fórmularios";
@@ -17,4 +26,5 @@ class CreateFormulario extends CreateRecord
     {
         return 'Visualização'; // Ou "Adicionar", "Gerar", etc.
     }
+    
 }

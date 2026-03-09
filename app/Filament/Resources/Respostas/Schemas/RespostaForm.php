@@ -22,7 +22,7 @@ class RespostaForm
                     ->hidden(fn($record) => $record !== null) // ESCONDE se estiver visualizando um item já salvo
                     ->schema([
                         Select::make('formulario_id')
-                            ->label('Selecione o Modelo de Formulário')
+                            ->label('Selecione o Formulário')
                             ->options(CreateFormulario::all()->pluck('titulo', 'id'))
                             ->live()
                             ->required()
