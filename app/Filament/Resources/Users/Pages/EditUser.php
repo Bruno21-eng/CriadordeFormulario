@@ -2,13 +2,13 @@
 
 namespace App\Filament\Resources\Users\Pages;
 
-use App\Filament\Resources\Users\UsersResource;
+use App\Filament\Resources\Users\UserResource;
 use Filament\Actions\DeleteAction;
 use Filament\Resources\Pages\EditRecord;
 
-class EditUsers extends EditRecord
+class EditUser extends EditRecord
 {
-    protected static string $resource = UsersResource::class;
+    protected static string $resource = UserResource::class;
 
     protected function getHeaderActions(): array
     {
