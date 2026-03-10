@@ -87,7 +87,7 @@ class CreateFormularioForm
                                     ->live()
                                     ->afterStateUpdated(fn(string $operation, $state, Set $set) => $operation === 'create'
                                         ? $set('id-seção', Str::slug($state)) : null),
-                                TextInput::make('id-seção')->required()->label('Id da Seção')->disabled()->dehydrated(),
+                                TextInput::make('id-seção')->required()->label('Id da Seção')->hidden()->dehydrated(),
                                 TextInput::make('descricao')->label('Descrição da Seção'),
                                 Repeater::make('Elementos')
                                     ->reorderableWithButtons()

@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\Users\Tables;
 
 use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Tables\Table;
@@ -15,11 +16,17 @@ class UserTable
         return $table
             ->columns([
                 TextColumn::make("name")
-                ->label("Nome"),
+                    ->label("Nome")
+                    ->sortable()
+                    ->searchable(),
                 TextColumn::make("email")
-                ->label("Email"),
-                
-            
+                    ->searchable()
+                    ->label("Email"),
+                TextColumn::make("created_at")
+                    ->label("Criado em:")
+                    ->sortable()
+                    ->dateTime('d/m/Y H:i'),
+
             ])
             ->filters([
                 //
@@ -28,9 +35,7 @@ class UserTable
                 EditAction::make(),
             ])
             ->toolbarActions([
-                BulkActionGroup::make([
-                    DeleteBulkAction::make(),
-                ]),
+
             ]);
     }
 }
