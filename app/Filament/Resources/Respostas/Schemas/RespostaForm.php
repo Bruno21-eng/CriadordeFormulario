@@ -23,7 +23,13 @@ class RespostaForm
                     ->schema([
                         Select::make('formulario_id')
                             ->label('Selecione o Formulário')
-                            ->options(CreateFormulario::all()->pluck('titulo', 'id'))
+                            ->options(function () {
+                                $query = CreateFormulario::query();
+                                if (!auth()->user()?->isAdmin()) {
+                                    $query->where('user_id', auth()->id());
+                                }
+                                return $query->pluck('titulo', 'id');
+                            })
                             ->live()
                             ->required()
                             ->native(false),
@@ -45,11 +51,26 @@ class RespostaForm
 
                 // SEÇÃO 3: LISTAGEM HISTÓRICA (Apenas na Criação, após selecionar o modelo)
                 Section::make('Histórico de Envios')
-                    ->description('Veja abaixo tudo o que já foi respondido para este modelo.')
+                    ->description('Veja abaixo tudo o que já foi respondido para este formulário.')
                     ->columnSpanFull()
                     ->visible(fn($get, $record) => $record === null && $get('formulario_id') !== null)
                     ->schema(function ($get) {
                         $formularioId = $get('formulario_id');
+                        if (!$formularioId) {
+                            return [];
+                        }
+                        $query = Resposta::where('createformulario_id', $formularioId);
+
+                        // Se não for admin, garantimos que ele só veja respostas de formulários que pertencem a ele
+                        if (!auth()->user()?->isAdmin()) {
+                            $query->whereHas('formulario', function ($q) {
+                                $q->where('user_id', auth()->id());
+                            });
+                        }
+
+                        $envios = $query->with('user')
+                            ->latest()
+                            ->get();
 
                         $envios = Resposta::where('createformulario_id', $formularioId)
                             ->with('user')

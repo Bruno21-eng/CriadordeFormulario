@@ -8,6 +8,9 @@ use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Tables\Table;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Columns\IconColumn;
+
+
 
 class UserTable
 {
@@ -23,10 +26,19 @@ class UserTable
                     ->searchable()
                     ->label("Email"),
                 TextColumn::make("created_at")
-                    ->label("Criado em:")
+                    ->label("Criado em")
+                    ->searchable()
                     ->sortable()
                     ->dateTime('d/m/Y H:i'),
-
+                IconColumn::make('is_admin')
+                    ->label('É adm')
+                    ->boolean()
+                    ->getStateUsing(fn ($record) => $record->role === 'admin')
+                    ->trueIcon('heroicon-s-check-badge')
+                    ->falseIcon('heroicon-o-x-circle')
+                    ->trueColor('success')
+                    ->falseColor('danger')
+                    ->alignCenter(),
             ])
             ->filters([
                 //

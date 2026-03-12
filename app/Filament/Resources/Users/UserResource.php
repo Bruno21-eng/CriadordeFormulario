@@ -51,7 +51,6 @@ class UserResource extends Resource
     }
     public static function canViewAny(): bool
     {
-        // Apenas quem for admin vê esse recurso no menu
         return auth()->user()?->isAdmin() ?? false;
     }
 }

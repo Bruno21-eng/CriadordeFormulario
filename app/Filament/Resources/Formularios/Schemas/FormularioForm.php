@@ -123,16 +123,16 @@ class FormularioForm
 
     // 2. Envolvemos o match e garantimos valores padrão para labels e opções
     $component =  match ($tipo) {
-        'Texto'      => TextInput::make($nomeDoCampo),
-        'Imagem'    => FileUpload::make($nomeDoCampo),
+        'Texto'      => TextInput::make($nomeDoCampo)->disabled(),
+        'Imagem'    => FileUpload::make($nomeDoCampo)->disabled(),
         'Seleção'    => Select::make($nomeDoCampo)
-                            ->options(collect($data['opcoes-selecao'] ?? [])->pluck('opcao-texto', 'opcao-texto')),
+                            ->options(collect($data['opcoes-selecao'] ?? [])->pluck('opcao-texto', 'opcao-texto'))->disabled(),
         'Radio'      => Radio::make($nomeDoCampo)
-                            ->options(collect($data['opcoes-selecao'] ?? [])->pluck('opcao-texto', 'opcao-texto')),
+                            ->options(collect($data['opcoes-selecao'] ?? [])->pluck('opcao-texto', 'opcao-texto'))->disabled(),
         'Calendário' => DatePicker::make($nomeDoCampo)
-                            ->displayFOrmat('d/m/Y'),
-        'RichEditor' => RichEditor::make($nomeDoCampo),
-        default      => TextInput::make($nomeDoCampo),
+                            ->displayFOrmat('d/m/Y')->disabled(),
+        'RichEditor' => RichEditor::make($nomeDoCampo)->disabled(),
+        default      => TextInput::make($nomeDoCampo)->disabled(),
     };
     $component->label($data['nome-elemento'] ?? 'Campo sem Título')
         ->helperText($data['descricao-elemento'] ?? null)

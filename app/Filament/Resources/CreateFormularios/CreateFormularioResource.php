@@ -9,6 +9,7 @@ use App\Filament\Resources\CreateFormularios\Schemas\CreateFormularioForm;
 use App\Filament\Resources\CreateFormularios\Tables\CreateFormulariosTable;
 use App\Models\CreateFormulario;
 use BackedEnum;
+use Illuminate\Database\Eloquent\Builder;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
@@ -53,4 +54,18 @@ class CreateFormularioResource extends Resource
             'edit' => Pages\EditCreateFormulario::route('/{record}/edit'),
         ];
     }
+
+    public static function getEloquentQuery(): Builder
+    {
+        $query = parent::getEloquentQuery();
+
+        // Se o usuário logado NÃO for admin, filtramos pelo ID dele
+        if (!auth()->user()?->isAdmin()) {
+            // Supondo que na sua tabela 'create_formularios' a coluna se chama 'user_id'
+            $query->where('user_id', auth()->id());
+        }
+
+        return $query;
+    }
+
 }

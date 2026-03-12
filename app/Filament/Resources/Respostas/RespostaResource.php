@@ -10,6 +10,8 @@ use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Tables\Table;
 use Filament\Infolists\Infolist;
+use Illuminate\Database\Eloquent\Builder;
+
 use BackedEnum;
 use Filament\Infolists\Components\Section;
 use Filament\Infolists\Components\TextEntry;
@@ -42,5 +44,18 @@ class RespostaResource extends Resource
             'create' => Pages\CreateResposta::route('/create'),
             'edit' => Pages\EditResposta::route('/{record}/edit'),
         ];
+    }
+
+    public static function getEloquentQuery(): Builder
+    {
+        $query = parent::getEloquentQuery();
+
+        // Se o usuário logado NÃO for admin, filtramos pelo ID dele
+        if (!auth()->user()?->isAdmin()) {
+            // Supondo que na sua tabela 'create_formularios' a coluna se chama 'user_id'
+            $query->where('user_id', auth()->id());
+        }
+
+        return $query;
     }
 }
