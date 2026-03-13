@@ -19,6 +19,7 @@ use Filament\Forms\Components\Toggle;
 use Filament\Forms\Components\RichEditor;
 use Filament\Schemas\Components\Grid;
 use Filament\Support\Enums\Width;
+use Filament\Forms\Components\CheckboxList;
 
 class CreateFormularioForm
 {
@@ -26,6 +27,13 @@ class CreateFormularioForm
     {
         return $schema
             ->components([
+                CheckboxList::make('technologies')
+                    ->options([
+                        'Imagem' => 'Carregar Imagem',
+                        'Calendário' => 'Campo de Data',
+
+                    ])
+                    ->columns(2),
                 Actions::make([
                     FormAction::make('preview')
                         ->label('Pré-visualizar')
@@ -62,7 +70,7 @@ class CreateFormularioForm
                             ->label('E-mail')
                             ->email()
                             ->required()
-                            ->helperText('Digite os e-mails que receberão o link do formulário, adicione um por um.')
+                            ->helperText('Digite os e-mails que receberão o link do formulário e depois Divulgue o Link!')
                     ])
                     ->addActionLabel(label: 'Adicionar Email')
                     ->reorderable(false)
@@ -71,36 +79,43 @@ class CreateFormularioForm
                             ->icon('heroicon-o-plus'),
                     ),
                 Repeater::make('paginas')
+                    ->reorderable(false)
+
                     ->aboveContent(components: 'Quantas páginas o seu formulário precisará?')
                     ->label('Páginas')
                     ->reorderableWithDragAndDrop(false)
                     ->reorderableWithButtons()
                     ->schema([
                         Repeater::make('Seções')
+                            ->columns(2)
+                            ->reorderable(false)
                             ->reorderableWithDragAndDrop(false)
                             ->reorderableWithButtons()
                             ->inset()
                             ->schema([
                                 TextInput::make('titulo-seção')
                                     ->required()
+                                    ->columnSpan(1)
                                     ->label('Título da Seção')
                                     ->live()
                                     ->afterStateUpdated(fn(string $operation, $state, Set $set) => $operation === 'create'
                                         ? $set('id-seção', Str::slug($state)) : null),
                                 TextInput::make('id-seção')->required()->label('Id da Seção')->hidden()->dehydrated(),
-                                TextInput::make('descricao')->label('Descrição da Seção'),
+                                TextInput::make('descricao')->label('Descrição da Seção')->columnSpan(1),
                                 Repeater::make('Elementos')
-                                    ->reorderableWithButtons()
+                                    ->columnSpanFull()
                                     ->collapsible()
+                                    ->reorderable(false)
                                     ->itemLabel(fn(array $state): ?string => $state['tipo-do-elemento'] ?? 'Novo Elemento')
                                     ->schema([
                                         Select::make('tipo-do-elemento')
                                             ->options([
                                                 'Texto' => 'Campo de texto',
+                                                'CheckboxList' => 'Seleção Múltipla',
                                                 'Radio' => 'Botão de opção',
                                                 'RichEditor' => 'Campo de texto avançado',
-                                                'Imagem' => 'Carregar Imagem',
                                                 'Seleção' => 'Caixa de Seleção',
+                                                'Imagem' => 'Carregar Imagem',
                                                 'Calendário' => 'Campo de Data',
                                             ])
                                             ->live()
@@ -116,7 +131,8 @@ class CreateFormularioForm
                                             ->label('Configurações Básicas')
                                             ->description('Preencha os detalhes do campo selecionado')
                                             ->compact()
-                                            ->visible(fn($get) => in_array($get('tipo-do-elemento'), ['Texto', 'Radio', 'RichEditor', 'Imagem', 'Seleção', 'Calendário']))
+                                            ->columns(fn($get) => in_array($get('tipo-do-elemento'), ['Radio', 'Seleção', 'CheckboxList']) ? false : 2)
+                                            ->visible(fn($get) => in_array($get('tipo-do-elemento'), ['Texto', 'Radio', 'RichEditor', 'Imagem', 'Seleção', 'Calendário', 'CheckboxList']))
                                             ->columnSpan(fn($get) => in_array($get('tipo-do-elemento'), ['Texto', 'Imagem', 'RichEditor', 'Calendário']) ? 'full' : 1)
                                             ->schema([
                                                 TextInput::make('nome-elemento')
@@ -131,15 +147,12 @@ class CreateFormularioForm
                                                     ->required()
                                                     ->disabled()
                                                     ->dehydrated()
+                                                    ->hidden()
                                                     ->placeholder('Ex: nome-usuario'),
                                                 TextInput::make('descricao-elemento')
                                                     ->label('Descrição do Elemento')
                                                     ->live()
                                                     ->placeholder('Digite uma descrição ou instrução para o usuário (ñ obrigatório)'),
-                                                TextInput::make('placeholder')
-                                                    ->label('Placeholder (Dica)')
-                                                    ->placeholder('Digite aqui...')
-                                                    ->hidden(condition: fn($get) => in_array($get('tipo-do-elemento'), ['Imagem', 'Seleção', 'Radio', 'Calendário'])),
                                             ]),
                                         Repeater::make('opcoes-selecao')
                                             ->label('Opções da Lista')
@@ -147,7 +160,7 @@ class CreateFormularioForm
                                                 TextInput::make('opcao-texto')->label('Texto da Opção')->required(),
                                                 TextInput::make('descrição')->label('Descrição da Opção')->hidden(fn($get) => $get('../../tipo-do-elemento') === 'Seleção'),
                                             ])
-                                            ->visible(fn($get) => in_array($get('tipo-do-elemento'), ['Seleção', 'Radio']))
+                                            ->visible(fn($get) => in_array($get('tipo-do-elemento'), ['Seleção', 'Radio', 'CheckboxList']))
                                             ->addActionLabel('Adicionar Opção'),
 
                                     ])
@@ -168,6 +181,7 @@ class CreateFormularioForm
                         fn(Action $action) => $action->icon('heroicon-s-document-plus'),
                     )
                     ->columnSpanFull()
+
             ]);
     }
 
