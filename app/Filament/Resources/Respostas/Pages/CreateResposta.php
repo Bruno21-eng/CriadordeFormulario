@@ -1,13 +1,13 @@
 <?php
 
-namespace App\Filament\Resources\Formularios\Pages;
+namespace App\Filament\Resources\Respostas\Pages;
 
-use App\Filament\Resources\Formularios\FormularioResource;
+use App\Filament\Resources\Respostas\RespostaResource;
 use Filament\Resources\Pages\CreateRecord;
 
-class CreateFormulario extends CreateRecord
+class CreateResposta extends CreateRecord
 {
-    protected static string $resource = FormularioResource::class;
+    protected static string $resource = RespostaResource::class;
 
     protected function getFormActions(): array
     {
@@ -20,11 +20,11 @@ class CreateFormulario extends CreateRecord
     }
     public function getTitle(): string
     {
-        return "Visualizar Fórmularios";
+        return "Visualizar Respostas";
     }
     public function getBreadcrumb(): string
     {
         return 'Visualização'; // Ou "Adicionar", "Gerar", etc.
     }
-    
 }
+

@@ -1,133 +1,146 @@
 <?php
 
+
 namespace App\Filament\Resources\Formularios\Schemas;
 
 use Filament\Schemas\Schema;
-use Filament\Forms\Components\Select;
-use Filament\Forms\Components\ToggleButtons;
-use Filament\Forms\Components\Repeater;
-use Filament\Forms\Components\TextInput;
-use Filament\Actions\Action;
-use Filament\Schemas\Components\Actions;
-use Filament\Actions\Action as FormAction;
 use Filament\Schemas\Components\Section;
-use Filament\Forms\Components\Toggle;
+use Filament\Schemas\Components\Group;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Hidden;
+use Filament\Forms\Components\Radio;
+use Filament\Forms\Components\DatePicker;
+use Filament\Forms\Components\Placeholder;
+use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\RichEditor;
-use Filament\Schemas\Components\Grid;
-use Filament\Support\Enums\Width;
+use Illuminate\Support\HtmlString;
+use App\Models\CreateFormulario;
+
 class FormularioForm
 {
     public static function configure(Schema $schema): Schema
     {
         return $schema
             ->components([
-                Actions::make([
-                    FormAction::make('preview')
-                        ->label('Pré-visualizar')
-                        ->icon('heroicon-m-eye')
-                        ->color('info')
-                        ->modalHeading('Visualização do Formulário')
-                        ->modalSubmitAction(false)
-                        ->modalWidth('7xl')
-                        ->slideOver()
-                            ->modalContent(fn ($get) => view('filament.forms.preview-container', [
-                                'paginas' => $get('paginas'),
-                                'titulo' => $get('titulo'),
-                            ])),
-                ]),
-                TextInput::make('titulo')
-                    ->required()
-                    ->label('Título do Formulário')
-                    ->columnSpanFull(),
-                Repeater::make('paginas')
-                ->label('Páginas')
-                ->schema([
-                    Repeater::make('Sessões')
-                        ->inset()
-                        ->schema([
-                            TextInput::make('titulo_sessão')->required()->label('Título da Sessão'),
-                            TextInput::make('id-sessao')->required()->label('Id da Sessão'),
-                            TextInput::make('descricao')->label('Descrição da Sessão'),
-                            Repeater::make('Elementos')
-                                ->reorderableWithButtons()
-                                ->collapsible()
-                                ->itemLabel(fn (array $state): ?string => $state['tipo_do_elemento'] ?? 'Novo Elemento')
-                                ->schema([
-                                    Select::make('tipo_do_elemento')
-                                        ->options([
-                                            'Texto' => 'Campo de texto',
-                                            'Radio' => 'Botão de opção',
-                                            'RichEditor' => 'Campo de texto avançado',
-                                            'Imagem' => 'Carregar Imagem',
-                                            'Seleção' => 'Caixa de Seleção',
-                                            'Calendário' => 'Campo de Data',
-                                        ])
-                                        ->live()
-                                        ->required(),
-                                    Toggle::make('Obrigatorio')
-                                        ->label('É Obrigatório?')
-                                        ->live()
-                                        ->inline(false)
-                                        ->onColor('success'),
-                                    Section::make()
-                                        ->label('Configurações Básicas')
-                                        ->description('Preencha os detalhes do campo selecionado')
-                                        ->compact()
-                                        ->visible(fn ($get) => in_array($get('tipo_do_elemento'), ['Texto','Radio','RichEditor','Imagem','Seleção']))
-                                        ->columnSpan(fn($get) => in_array($get('tipo_do_elemento'), ['Texto', 'Imagem', 'RichEditor']) ? 'full' : 1)
-                                        ->schema([
-                                            TextInput::make('nome_elemento')
-                                                ->label('Nome do Elemento')
-                                                ->required()
-                                                ->placeholder('Ex: Nome Completo'),
-                                            TextInput::make('id_elemento')
-                                                ->label('ID do Elemento')
-                                                ->required()
-                                                ->placeholder('Ex: nome_usuario'),
-                                            TextInput::make('descricao_elemento')
-                                                ->label('Descrição do Elemento')
-                                                ->live()
-                                                ->placeholder('Digite uma descrição ou instrução para o usuário (ñ obrigatório)'),
-                                            TextInput::make('placeholder')
-                                                ->label('Placeholder (Dica)')
-                                                ->placeholder('Digite aqui...')
-                                                ->hidden(fn ($get) => in_array($get('tipo_do_elemento'), ['Imagem', 'Seleção', 'Radio'])),
-                                        ]),
-                                    Repeater::make('opcoes_selecao')
-                                        ->label('Opções da Lista')
-                                        ->schema([
-                                            TextInput::make('opcao_texto')->label('Texto da Opção')->required(),
-                                            TextInput::make('descrição')->label('Descrição da Opção')->hidden(fn ($get) => $get('../../tipo_do_elemento') === 'Seleção'),
-                                        ])
-                                        ->visible(fn ($get) => in_array($get('tipo_do_elemento'), ['Seleção', 'Radio']))
-                                        ->addActionLabel('Adicionar Opção'),
-                                    Repeater::make('opcoes_calendario')
-                                        ->label('Opções do Calendário')
-                                        ->schema([
-                                            TextInput::make('opcao_texto')->label('Título do Calendário')->required(),
-                                            TextInput::make('id_elemento')->label('ID do Elemento')->required()->placeholder('Ex: data_nascimento'),
-                                        ])
-                                        ->visible(fn ($get) => $get('tipo_do_elemento') === 'Calendário')
-                                        ->columnSpan('full')
-                                        ->addActionLabel('Adicionar Calendário'),
-                                ])
-                                ->addActionLabel('Adicionar Elemento')
-                                ->addAction(
-                                    fn (Action $action) => $action->icon('heroicon-s-plus'),
-                                )
-                                ->columns(2),
-                        ])
-                        ->addActionLabel('Adicionar Sessão')
-                        ->addAction(
-                            fn (Action $action) => $action
-                            ->icon('heroicon-m-plus-circle'),
-                        )
-                ])
-                ->addActionLabel('Adicionar Página')
-                ->addAction(
-                    fn (Action $action) => $action->icon('heroicon-s-document-plus'),
-                )
-                ->columnSpanFull()
-            ]);                             
+                Section::make('Configuração Inicial')
+                    ->columnSpanFull()
+                    ->schema([
+                        Select::make('Createformulario_id')
+                            ->label('Selecione o Modelo de Formulário')
+                            ->options(CreateFormulario::all()->pluck('titulo', 'id'))
+                            ->live()
+                            ->required(),
+                    ]),
+                
+                Group::make()
+                    ->columnSpanFull()
+                    ->schema(function ($get, $record): array {
+                        $CreateformularioId = $record?->Createformulario_id ?? $get('Createformulario_id');
+
+                        if (!$CreateformularioId) {
+                            return [];
+                        }
+                        $config = CreateFormulario::find($CreateformularioId);
+                        $titulo = $config?->titulo ?? 'Formulário sem Título';
+
+                        return array_merge(
+                            [
+                                Placeholder::make('titulo_exibicao')
+                                    ->hiddenLabel()
+                                    ->content(new HtmlString("
+                                        <h1 style='font-size: 2rem; font-weight: bold; margin-bottom: 1rem;'>
+                                            {$titulo}
+                                        </h1>
+                                        <hr style='margin-bottom: 2rem; border-top: 1px solid #ccc;'>
+                            ")),
+                            ],
+                            self::FormularioDinamico((int) $CreateformularioId)
+                        );
+                    })
+            ]);
+    }
+
+    public static function FormularioDinamico(int $CreateformularioId): array
+    {
+        $config = CreateFormulario::find($CreateformularioId);
+
+        if (!$config || !isset($config->paginas)) {
+            return [];
         }
+
+        $components = [
+            Hidden::make('Createformulario_id')->default($CreateformularioId)
+        ];
+
+        $totalPaginas = count($config->paginas);
+
+        foreach ($config->paginas as $index => $pagina) {
+            if ($totalPaginas > 1) {
+                $numeroPagina = $index + 1;
+                
+                $components[] = Placeholder::make('.')
+                    ->content(new HtmlString("
+                        <div class='flex items-center space-x-2 bg-gray-100 w-fit px-4 py-2 rounded-full border border-gray-200 shadow-sm mb-4'>
+                            <span class='flex h-3 w-3 rounded-full bg-yellow-400 animate-pulse'></span>
+                            <span class='text-xs font-bold uppercase tracking-widest text-gray-600'>
+                                Visualizando: Página {$numeroPagina} de {$totalPaginas}
+                            </span>
+                        </div>"   
+                    ));
+            }    
+
+
+            $seções = $pagina['Seções'] ?? [];
+            
+            foreach ($seções as $seção) {
+                $camposDaSeção = [];
+                $elementos = $seção['Elementos'] ?? [];
+
+                foreach ($elementos as $elemento) {
+                    $camposDaSeção[] = self::ElementoParaComponente($elemento);
+                }
+
+                $components[] = Section::make($seção['titulo-seção'] ?? 'Dados')
+                    ->description($seção['descricao'] ?? '')
+                    ->schema($camposDaSeção);
+            }
+        }
+
+        return $components;
+    }
+
+    protected static function ElementoParaComponente(array $data)
+{
+    if (!isset($data['id-elemento']) || empty($data['id-elemento'])) {
+        return Placeholder::make('erro_id')
+            ->label('Erro de Configuração')
+            ->content('Um elemento foi criado sem ID no formulário original.');
+    }
+
+    $nomeDoCampo = "respostas.{$data['id-elemento']}";
+    $tipo = $data['tipo-do-elemento'] ?? 'Texto';
+
+    // 2. Envolvemos o match e garantimos valores padrão para labels e opções
+    $component =  match ($tipo) {
+        'Texto'      => TextInput::make($nomeDoCampo)->disabled(),
+        'Imagem'    => FileUpload::make($nomeDoCampo)->disabled(),
+        'Seleção'    => Select::make($nomeDoCampo)
+                            ->options(collect($data['opcoes-selecao'] ?? [])->pluck('opcao-texto', 'opcao-texto'))->disabled(),
+        'Radio'      => Radio::make($nomeDoCampo)
+                            ->options(collect($data['opcoes-selecao'] ?? [])->pluck('opcao-texto', 'opcao-texto'))->disabled(),
+        'Calendário' => DatePicker::make($nomeDoCampo)
+                            ->displayFOrmat('d/m/Y')->disabled(),
+        'RichEditor' => RichEditor::make($nomeDoCampo)->disabled(),
+        default      => TextInput::make($nomeDoCampo)->disabled(),
+    };
+    $component->label($data['nome-elemento'] ?? 'Campo sem Título')
+        ->helperText($data['descricao-elemento'] ?? null)
+        ->required(fn () => (bool) ($data['Obrigatorio'] ?? false));
+    if (in_array($tipo, ['Texto', 'Seleção', 'RichEditor']) && !empty($data['placeholder'])) {
+        $component->placeholder($data['placeholder']);
+    }
+
+    return $component;
+}
 }

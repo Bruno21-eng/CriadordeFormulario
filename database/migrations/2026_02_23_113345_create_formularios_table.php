@@ -13,10 +13,10 @@ return new class extends Migration
     {
         Schema::create('formularios', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->constrained()->onDelete('cascade');
-            $table->string('criador_nome');
-            $table->string('titulo');
-            $table->json('paginas');
+            // FK para saber de qual formulário essa resposta pertence
+            $table->foreignId('Createformulario_id')->constrained('Createformularios')->onDelete('cascade');
+            // Onde vamos salvar as respostas (ex: {"nome": "João", "idade": 25})
+            $table->json('respostas')->nullable(); 
             $table->timestamps();
         });
     }
